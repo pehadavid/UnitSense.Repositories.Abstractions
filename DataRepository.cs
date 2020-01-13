@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using UnitSense.CacheManagement;
 using UnitSense.Repositories.Abstractions.Filters;
@@ -16,7 +15,7 @@ namespace UnitSense.Repositories.Abstractions
     /// <typeparam name="TSecondKey">Index/secondary key type</typeparam>
     /// <typeparam name="TDbContext"></typeparam>
     public abstract class DataRepository<TDbContext, TData, TKey, TSecondKey>
-        where TData : class where TDbContext : DbContext
+        where TData : class 
     {
         protected RedisCacheManager redisCacheManager;
         protected LocalCacheManager localCacheManager;
@@ -96,7 +95,7 @@ namespace UnitSense.Repositories.Abstractions
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public string GetPrimKeyValue(TKey key)
+        public virtual string GetPrimKeyValue(TKey key)
         {
             return $"{key}";
         }
@@ -106,7 +105,7 @@ namespace UnitSense.Repositories.Abstractions
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public string GetSecondaryKeyValue(TSecondKey key)
+        public virtual string GetSecondaryKeyValue(TSecondKey key)
         {
             return $"secondary:{key}";
         }
@@ -251,17 +250,17 @@ namespace UnitSense.Repositories.Abstractions
 
 
         /// <summary>
-        /// get a collection of <see cref="TData"/> using a <see cref="IQueryFilter{TDbContext,TData}"/> model
+        /// get a collection of <see cref="TData"/> using a <see cref="QueryFilter"/> model
         /// </summary>
         /// <param name="filters"></param>
         /// <returns></returns>
-        public virtual Task<FilteredDataSetResult<TData>> GetListAsync(IQueryFilter<TDbContext, TData> filters)
+        public virtual Task<FilteredDataSetResult<TData>> GetListAsync(QueryFilter filters)
         {
-            Func<Task<FilteredDataSetResult<TData>>> funcGen = () => filters.CreateGenTask(dbContext);
+            Func<Task<FilteredDataSetResult<TData>>> funcGen = () => filters.CreateGenTaskAsync<TDbContext, TData>(dbContext);
             return FindDataHashetAsync(filters.GetUniqueKey(), funcGen);
         }
 
-        /// <summary>
+        /// <summary>   
         /// get <see cref="TData"/> using secondary key (single element)
         /// </summary>
         /// <param name="key"></param>
@@ -364,10 +363,5 @@ namespace UnitSense.Repositories.Abstractions
         public virtual void Dispose()
         {
         }
-    }
-
-    public class RepositorySetup
-    {
-        public string EnvironnementPrefix { get; set; }
     }
 }

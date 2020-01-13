@@ -1,12 +1,7 @@
-﻿using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-
 namespace UnitSense.Repositories.Abstractions.Filters
 {
-    public interface IQueryFilter<in TDbContext, TData> where TDbContext : DbContext
+    public interface IQueryFilter<in TDbContext,  TData>
     {
-        Task<FilteredDataSetResult<TData>> CreateGenTask(TDbContext dbContext);
-        string GetUniqueKey();
-
+        
     }
 }
