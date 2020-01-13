@@ -250,13 +250,13 @@ namespace UnitSense.Repositories.Abstractions
 
 
         /// <summary>
-        /// get a collection of <see cref="TData"/> using a <see cref="QueryFilter"/> model
+        /// get a collection of <see cref="TData"/> using a <see cref="IQueryFilter"/> model
         /// </summary>
         /// <param name="filters"></param>
         /// <returns></returns>
-        public virtual Task<FilteredDataSetResult<TData>> GetListAsync(QueryFilter filters)
+        public virtual Task<FilteredDataSetResult<TData>> GetListAsync(IQueryFilter<TDbContext, TData> filters)
         {
-            Func<Task<FilteredDataSetResult<TData>>> funcGen = () => filters.CreateGenTaskAsync<TDbContext, TData>(dbContext);
+            Func<Task<FilteredDataSetResult<TData>>> funcGen = () => filters.CreateGenTask(dbContext);
             return FindDataHashetAsync(filters.GetUniqueKey(), funcGen);
         }
 
