@@ -302,6 +302,15 @@ namespace UnitSense.Repositories.Abstractions
         public abstract Task RefreshAsync(TKey key);
 
         /// <summary>
+        /// Refresh all cache subsystem from database, then get result
+        /// </summary>
+        /// <param name="key"></param>
+        public virtual Task<TData> RefreshAndGetAsync(TKey key)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// delete <see cref="TData"/> across all data subsystems
         /// </summary>
         /// <param name="key"></param>
