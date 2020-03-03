@@ -198,6 +198,7 @@ namespace UnitSense.Repositories.Abstractions
         {
             var morphedKey = MorphKey(key);
             this.redisCacheManager.SetValue(morphedKey, item, lngTs);
+          
             redisCacheManager.DeleteHashSet(hashSetKey);
             localCacheManager.DeleteHashSet(hashSetKey);
             return busHandler.PublishAsync(JsonConvert.SerializeObject(

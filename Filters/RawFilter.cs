@@ -21,7 +21,7 @@ namespace UnitSense.Repositories.Abstractions.Filters
         public RawFilter(RawFilter rawFilter)
         {
             this.CopyPropertiesFrom(rawFilter);
-            if (rawFilter.Nb < 1 || rawFilter.Nb > 200)
+            if (rawFilter.Nb < 1)
             {
                 this.Nb = RawFilter.DefaultNb;
             }
