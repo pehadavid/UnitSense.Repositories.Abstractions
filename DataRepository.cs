@@ -381,11 +381,19 @@ namespace UnitSense.Repositories.Abstractions
         /// <summary>
         /// Delete all resources in cache subsystems
         /// </summary>
-        public async Task FlushAsync()
+        public async Task<CacheOpResult> FlushAsync()
         {
-            this.localCacheManager.Clear();
-            var db = this.redisCacheManager.GetMultiplexer().GetDatabase();
-            var redisResult = db.Execute($"KEYS *{mainPrefix}:{setup.EnvironnementPrefix}:*");
+            try
+            {
+                this.localCacheManager.Clear();
+                var db = this.redisCacheManager.GetMultiplexer().GetDatabase();
+                var redisResult = await db.ExecuteAsync($"KEYS *{mainPrefix}:{setup.EnvironnementPrefix}:*");
+                return CacheOpResult.SUCCESS;
+            }
+            catch (Exception e)
+            {
+                return CacheOpResult.FAULTED;
+            }
         }
 
         public virtual void Dispose()
