@@ -194,16 +194,25 @@ namespace UnitSense.Repositories.Abstractions
         /// <param name="key"></param>
         /// <param name="item"></param>
         /// <returns></returns>
-        protected Task WriteCacheDataAsync(string key, object item)
+        protected async Task<CacheOpResult> WriteCacheDataAsync(string key, object item)
         {
-            var morphedKey = MorphKey(key);
-            this.redisCacheManager.SetValue(morphedKey, item, lngTs);
+            try
+            {
+                var morphedKey = MorphKey(key);
+                this.redisCacheManager.SetValue(morphedKey, item, lngTs);
           
-            redisCacheManager.DeleteHashSet(hashSetKey);
-            localCacheManager.DeleteHashSet(hashSetKey);
-            return busHandler.PublishAsync(JsonConvert.SerializeObject(
-                new BroadcastItem(item, BroadcastOperation.WRITE, hashSetKey) {Key = morphedKey},
-                RedisCacheManager.GetJsonSerializerSettings()));
+                redisCacheManager.DeleteHashSet(hashSetKey);
+                localCacheManager.DeleteHashSet(hashSetKey);
+                await busHandler.PublishAsync(JsonConvert.SerializeObject(
+                    new BroadcastItem(item, BroadcastOperation.WRITE, hashSetKey) {Key = morphedKey},
+                    RedisCacheManager.GetJsonSerializerSettings()));
+                return CacheOpResult.SUCCESS;
+            }
+            catch (Exception e)
+            {
+                return CacheOpResult.FAULTED;
+            }
+     
         }
         
         
@@ -214,17 +223,26 @@ namespace UnitSense.Repositories.Abstractions
         /// <param name="key"></param>
         /// <param name="item"></param>
         /// <returns></returns>
-        protected Task DeleteCacheDataAsync(string key, TData item)
+        protected async Task<CacheOpResult> DeleteCacheDataAsync(string key, TData item)
         {
-            var morphedKey = MorphKey(key);
-            var redisTask = redisCacheManager.DeleteAsync(morphedKey);
-            var localTask = localCacheManager.DeleteAsync(morphedKey);
-            redisCacheManager.DeleteHashSet(hashSetKey);
-            localCacheManager.DeleteHashSet(hashSetKey);
-            var broadcastTask = busHandler.PublishAsync(JsonConvert.SerializeObject(
-                new BroadcastItem(item, BroadcastOperation.DELETE, hashSetKey) {Key = morphedKey},
-                RedisCacheManager.GetJsonSerializerSettings()));
-            return Task.WhenAll(redisTask, localTask, broadcastTask);
+            try
+            {
+                var morphedKey = MorphKey(key);
+                var redisTask = redisCacheManager.DeleteAsync(morphedKey);
+                var localTask = localCacheManager.DeleteAsync(morphedKey);
+                redisCacheManager.DeleteHashSet(hashSetKey);
+                localCacheManager.DeleteHashSet(hashSetKey);
+                var broadcastTask = busHandler.PublishAsync(JsonConvert.SerializeObject(
+                    new BroadcastItem(item, BroadcastOperation.DELETE, hashSetKey) {Key = morphedKey},
+                    RedisCacheManager.GetJsonSerializerSettings()));
+                await Task.WhenAll(redisTask, localTask, broadcastTask);
+                return CacheOpResult.SUCCESS;
+            }
+            catch (Exception e)
+            {
+                return CacheOpResult.FAULTED;
+            }
+          
         }
 
         #endregion
