@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MessagePack;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +22,7 @@ namespace PehaCorp.Repositories.Abstractions.Tests.Repos
 
         }
 
-        public async Task<FilteredDataSetResult<Employee>> CreateGenTask(FakeDbContext dbContext)
+        public async Task<FilteredDataSetResult<Employee>> CreateGenTask(FakeDbContext dbContext, CancellationToken cancellationToken = default)
         {
             var query = dbContext.Employees.AsNoTracking();
             
@@ -41,7 +42,7 @@ namespace PehaCorp.Repositories.Abstractions.Tests.Repos
 
 
             results.MaxPage = Convert.ToInt32(Math.Ceiling(results.TotalItems / (double)this.Nb));
-            results.Results = await query.Skip(skipValue).Take(Nb).ToListAsync();
+            results.Results = await query.Skip(skipValue).Take(Nb).ToListAsync(cancellationToken: cancellationToken);
             return results;
         }
 

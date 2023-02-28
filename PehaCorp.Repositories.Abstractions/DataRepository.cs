@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using PehaCorp.CacheManagement;
 using PehaCorp.Repositories.Abstractions.Filters;
@@ -118,8 +119,9 @@ namespace PehaCorp.Repositories.Abstractions
         /// <typeparam name="TData"></typeparam>
         /// <param name="key"></param>
         /// <param name="dataGeneratorAsync"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        protected  async Task<TData> FindDataAsync<TData>(string key, Func<Task<TData>> dataGeneratorAsync)
+        protected  async Task<TData> FindDataAsync<TData>(string key, Func<Task<TData>> dataGeneratorAsync, CancellationToken cancellationToken = default)
             where TData : class
         {
             var morphedKey = MorphKey(key);
@@ -155,9 +157,10 @@ namespace PehaCorp.Repositories.Abstractions
         /// <param name="hashsetKey"></param>
         /// <param name="itemKey"></param>
         /// <param name="dataGeneratorAsync"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         protected async Task<TData> FindDataHashetAsync<TData>(string itemKey,
-            Func<Task<TData>> dataGeneratorAsync) where TData : class
+            Func<Task<TData>> dataGeneratorAsync, CancellationToken cancellationToken = default) where TData : class
         {
             try
             {
@@ -264,19 +267,21 @@ namespace PehaCorp.Repositories.Abstractions
         /// get <see cref="TData"/> using primary key (single element, asynchronous)
         /// </summary>
         /// <param name="key"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public abstract Task<TData> GetByIdAsync(TKey key);
+        public abstract Task<TData> GetByIdAsync(TKey key, CancellationToken cancellationToken = default);
 
 
         /// <summary>
         /// get a collection of <see cref="TData"/> using a <see cref="IQueryFilter{TDbContext,TData}"/> model
         /// </summary>
         /// <param name="filters"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual Task<FilteredDataSetResult<TData>> GetListAsync(IQueryFilter<TDbContext, TData> filters)
+        public virtual Task<FilteredDataSetResult<TData>> GetListAsync(IQueryFilter<TDbContext, TData> filters, CancellationToken cancellationToken = default)
         {
-            Func<Task<FilteredDataSetResult<TData>>> funcGen = () => filters.CreateGenTask(dbContext);
-            return FindDataHashetAsync(filters.GetUniqueKey(), funcGen);
+            Func<Task<FilteredDataSetResult<TData>>> funcGen = () => filters.CreateGenTask(dbContext, cancellationToken);
+            return FindDataHashetAsync(filters.GetUniqueKey(), funcGen, cancellationToken);
         }
 
         /// <summary>   
@@ -293,8 +298,9 @@ namespace PehaCorp.Repositories.Abstractions
         /// get <see cref="TData"/> using secondary key (single element, asynchronous)
         /// </summary>
         /// <param name="key"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public abstract Task<TData> GetBySecondaryAsync(TSecondKey key);
+        public abstract Task<TData> GetBySecondaryAsync(TSecondKey key, CancellationToken cancellationToken = default);
 
 
         /// <summary>
@@ -310,15 +316,16 @@ namespace PehaCorp.Repositories.Abstractions
         /// put <see cref="TData"/> across all data subsystems (asynchronous)
         /// </summary>
         /// <param name="data"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public abstract Task PutAsync(TData data);
-
+        public abstract Task PutAsync(TData data, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Refresh all cache subsystem from database
         /// </summary>
         /// <param name="key"></param>
-        public abstract Task RefreshAsync(TKey key);
+        /// <param name="cancellationToken"></param>
+        public abstract Task RefreshAsync(TKey key, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Refresh all cache subsystem from database, then get result
@@ -342,8 +349,9 @@ namespace PehaCorp.Repositories.Abstractions
         /// delete <see cref="TData"/> across all data subsystems (asynchronous)
         /// </summary>
         /// <param name="key"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public abstract Task DeleteAsync(TKey key);
+        public abstract Task DeleteAsync(TKey key, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// update <see cref="TData"/> across all data subsystems
@@ -358,8 +366,9 @@ namespace PehaCorp.Repositories.Abstractions
         /// update <see cref="TData"/> across all data subsystems (asynchronous)
         /// </summary>
         /// <param name="data"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public abstract Task UpdateAsync(TData data);
+        public abstract Task UpdateAsync(TData data, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// write <see cref="TData"/> across all cache subsystems

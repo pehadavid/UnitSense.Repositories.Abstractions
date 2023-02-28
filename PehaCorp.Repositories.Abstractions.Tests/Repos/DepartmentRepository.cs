@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PehaCorp.CacheManagement;
@@ -16,45 +17,52 @@ namespace PehaCorp.Repositories.Abstractions.Tests.Repos
             this.UseBus = useCache;
         }
 
-        public override Task<Departement> GetByIdAsync(int key)
+        public override Task<Departement> GetByIdAsync(int key, CancellationToken cancellationToken = default)
         {
             return FindDataAsync(GetPrimKeyValue(key),
-                async () => { return await dbContext.Departements.FirstOrDefaultAsync(x => x.DepartmentId == key); });
+                async () => { return await dbContext.Departements.FirstOrDefaultAsync(x => x.DepartmentId == key); }, cancellationToken);
         }
 
-        public override Task<Departement> GetBySecondaryAsync(string key)
+        public override Task<Departement> GetBySecondaryAsync(string key, CancellationToken cancellationToken = default)
         {
             return FindDataAsync(GetSecondaryKeyValue(key),
-                async () => { return await dbContext.Departements.FirstOrDefaultAsync(x => x.Name == key); });
+                async () => { return await dbContext.Departements.FirstOrDefaultAsync(x => x.Name == key, cancellationToken: cancellationToken); }, cancellationToken);
         }
 
-        public override async Task PutAsync(Departement data)
+        public override async Task PutAsync(Departement data,CancellationToken cancellationToken = default)
         {
-            await dbContext.Departements.AddAsync(data);
-            await dbContext.SaveChangesAsync();
-            await WriteAllToCache(data);
+            await dbContext.Departements.AddAsync(data, cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
+            if (!cancellationToken.IsCancellationRequested)
+            {
+                await WriteAllToCache(data);
+            }
+       
         }
 
-        public override async Task RefreshAsync(int key)
+        public override async Task RefreshAsync(int key, CancellationToken cancellationToken = default)
         {
-            var item = await dbContext.Departements.FirstOrDefaultAsync(x => x.DepartmentId == key);
+            var item = await dbContext.Departements.FirstOrDefaultAsync(x => x.DepartmentId == key, cancellationToken: cancellationToken);
             await WriteAllToCache(item);
         }
 
-        public override async Task DeleteAsync(int key)
+        public override async Task DeleteAsync(int key, CancellationToken cancellationToken = default)
         {
-            var data = await dbContext.Departements.FirstOrDefaultAsync(x => x.DepartmentId == key);
+            var data = await dbContext.Departements.FirstOrDefaultAsync(x => x.DepartmentId == key, cancellationToken: cancellationToken);
             await DeleteAllFromCache(data);
             dbContext.Departements.Remove(data);
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public override async Task UpdateAsync(Departement data)
+        public override async Task UpdateAsync(Departement data, CancellationToken cancellationToken = default)
         {
-            var dbItem = await dbContext.Departements.FirstOrDefaultAsync(x => x.DepartmentId == data.DepartmentId);
-            dbItem.CopyPropertiesFrom(data);
-            await dbContext.SaveChangesAsync();
-            await WriteAllToCache(dbItem);
+            var dbItem = await dbContext.Departements.FirstOrDefaultAsync(x => x.DepartmentId == data.DepartmentId, cancellationToken: cancellationToken);
+            if (!cancellationToken.IsCancellationRequested)
+            {
+                dbItem.CopyPropertiesFrom(data);
+                await dbContext.SaveChangesAsync(cancellationToken);
+                await WriteAllToCache(dbItem);
+            }
         }
 
         protected override async Task WriteAllToCache(Departement data)
