@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using UnitSense.CacheManagement;
+using PehaCorp.CacheManagement;
 
 namespace PehaCorp.Repositories.Abstractions.Tests.Repos
 {

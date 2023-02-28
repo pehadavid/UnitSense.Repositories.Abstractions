@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
+using PehaCorp.CacheManagement;
 using PehaCorp.Repositories.Abstractions.Filters;
-using UnitSense.CacheManagement;
 
 namespace PehaCorp.Repositories.Abstractions
 {
@@ -203,7 +203,7 @@ namespace PehaCorp.Repositories.Abstractions
           
                 redisCacheManager.DeleteHashSet(hashSetKey);
                 localCacheManager.DeleteHashSet(hashSetKey);
-                await busHandler.PublishAsync(JsonConvert.SerializeObject(
+                await busHandler.PublishAsync(JsonSerializer.Serialize(
                     new BroadcastItem(item, BroadcastOperation.WRITE, hashSetKey) {Key = morphedKey},
                     RedisCacheManager.GetJsonSerializerSettings()));
                 return CacheOpResult.SUCCESS;
@@ -232,7 +232,7 @@ namespace PehaCorp.Repositories.Abstractions
                 var localTask = localCacheManager.DeleteAsync(morphedKey);
                 redisCacheManager.DeleteHashSet(hashSetKey);
                 localCacheManager.DeleteHashSet(hashSetKey);
-                var broadcastTask = busHandler.PublishAsync(JsonConvert.SerializeObject(
+                var broadcastTask = busHandler.PublishAsync(JsonSerializer.Serialize(
                     new BroadcastItem(item, BroadcastOperation.DELETE, hashSetKey) {Key = morphedKey},
                     RedisCacheManager.GetJsonSerializerSettings()));
                 await Task.WhenAll(redisTask, localTask, broadcastTask);
