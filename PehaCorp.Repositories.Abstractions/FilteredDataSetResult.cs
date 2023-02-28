@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace UnitSense.Repositories.Abstractions
+namespace PehaCorp.Repositories.Abstractions
 {
     public class FilteredDataSetResult<T>
     {

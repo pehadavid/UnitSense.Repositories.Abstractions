@@ -1,4 +1,4 @@
-namespace UnitSense.Repositories.Abstractions
+namespace PehaCorp.Repositories.Abstractions
 {
     public class RepositorySetup
     {

@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace UnitSense.Repositories.Abstractions
+namespace PehaCorp.Repositories.Abstractions
 {
     public class PropertyCopier<TParent, TChild> where TParent : class
         where TChild : class

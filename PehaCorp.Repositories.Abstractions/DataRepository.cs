@@ -2,10 +2,10 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using PehaCorp.Repositories.Abstractions.Filters;
 using UnitSense.CacheManagement;
-using UnitSense.Repositories.Abstractions.Filters;
 
-namespace UnitSense.Repositories.Abstractions
+namespace PehaCorp.Repositories.Abstractions
 {
     /// <summary>
     /// Allow to handle data with traversal cache management
@@ -269,7 +269,7 @@ namespace UnitSense.Repositories.Abstractions
 
 
         /// <summary>
-        /// get a collection of <see cref="TData"/> using a <see cref="IQueryFilter"/> model
+        /// get a collection of <see cref="TData"/> using a <see cref="IQueryFilter{TDbContext,TData}"/> model
         /// </summary>
         /// <param name="filters"></param>
         /// <returns></returns>

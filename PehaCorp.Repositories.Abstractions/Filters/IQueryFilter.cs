@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using MessagePack;
 
-namespace UnitSense.Repositories.Abstractions.Filters
+namespace PehaCorp.Repositories.Abstractions.Filters
 {
 
  
