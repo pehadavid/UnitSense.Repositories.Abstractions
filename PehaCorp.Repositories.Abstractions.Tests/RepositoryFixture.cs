@@ -7,6 +7,8 @@ namespace PehaCorp.Repositories.Abstractions.Tests
     public class RepositoryFixture
     {
         public FakeDbContext DbContext { get; private set; }
+
+        public EmployeesRepository EmployeesRepository { get; private set; }
         public RepositorySetup Setup { get; set; }
 
         public RepositoryFixture()
@@ -17,9 +19,8 @@ namespace PehaCorp.Repositories.Abstractions.Tests
 
             DbContext = new FakeDbContext(builder.Options);
             DbContext.Database.Migrate();
-            Setup = new RepositorySetup() { EnvironnementPrefix = "xUnit"};
-
-
+            Setup = new RepositorySetup() { EnvironnementPrefix = "xUnit" };
+            EmployeesRepository = new EmployeesRepository(null, null, DbContext, null, typeof(Employee), Setup, false);
         }
     }
 }

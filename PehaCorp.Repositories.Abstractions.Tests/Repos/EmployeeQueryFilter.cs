@@ -8,7 +8,7 @@ using PehaCorp.Repositories.Abstractions.Filters;
 
 namespace PehaCorp.Repositories.Abstractions.Tests.Repos
 {
-    [MessagePackObject()]
+    [MessagePackObject(keyAsPropertyName: true)]
     public class EmployeeQueryFilter : RawFilter, IQueryFilter<FakeDbContext, Employee>
     {
 
@@ -46,6 +46,10 @@ namespace PehaCorp.Repositories.Abstractions.Tests.Repos
             return results;
         }
 
-
+        public string GetUniqueKey()
+        {
+            var data = MessagePackSerializer.Serialize(this);
+            return $"EmployeeQueryFilter:{BitConverter.ToString(data)}";
+        }
     }
 }
