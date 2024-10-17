@@ -10,7 +10,7 @@
     <RepositoryUrl>https://github.com/pehadavid/PehaCorp.Repositories</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MessagePack" Version="2.4.59" />
+    <PackageReference Include="MessagePack" Version="2.5.187" />
     <PackageReference Include="PehaCorp.CacheManagement" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
